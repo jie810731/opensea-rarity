@@ -1,0 +1,8 @@
+version: "3"
+services:
+  getlist:
+    build:
+      context: ./
+      dockerfile: ./dockerFile/GetListDockerfile
+    volumes:
+      - ./:/app
