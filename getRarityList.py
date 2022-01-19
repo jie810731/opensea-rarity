@@ -31,7 +31,7 @@ def getListResponse():
 def getContractAddress(list_response):
     result = []
     for object in list_response['data']['collections']:
-        result.append(object['id'])
+        result.append(object['collection']['slug'])
     
     return result
 
