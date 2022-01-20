@@ -113,6 +113,8 @@ if __name__ == '__main__':
             print('no file go to sleep for a minute')
             time.sleep(60)
 
+            continue
+
         threads = []
         for index,filename in enumerate(filenames):
             threads.append(threading.Thread(target = listenJob,args = (filename,)))

@@ -2,6 +2,8 @@ import requests
 import json
 import pause
 import datetime
+from filelock import FileLock
+import time
 
 def getListResponse():
     try:
@@ -42,8 +44,14 @@ if __name__ == "__main__":
         list_response = getListResponse()
         contract_address = getContractAddress(list_response)
 
-        f = open("{}.txt".format('listen/listen_collection'),"w")
-        f.write(json.dumps(contract_address))
+        file_path = 'listen/listen_collection.txt'
+        with FileLock(file_path):
+            f = open(file_path,"w")
+            print(contract_address)
+            f.write(json.dumps(contract_address))
+            f.close()
+
+        print('get rarity list finish')
 
         now = datetime.datetime.now()
         until_time = now + datetime.timedelta(hours=1)

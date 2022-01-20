@@ -16,7 +16,7 @@ def getAssetItems(file_path):
     return data
 
 def getAsset(contract ,token_id):
-    url = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(contract,token_id)
+    url = 'https://api.opensea.io/api/v1/asset/{}/{}?format=json'.format(contract,token_id)
     header = { 
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36",
     }
@@ -28,7 +28,8 @@ def getAsset(contract ,token_id):
     except Exception as ex:
         print('error')
         print(ex)
-        pass
+        
+        return
 
     return data
 
@@ -52,7 +53,7 @@ def getLastPrice(contract,token_id):
 def storeRarity(filename):
     items = getAssetItems(filename)
     total_count = len(items)
-    print(total_count)
+
     result = {
         'A':{
             'top_index':0,
@@ -97,6 +98,7 @@ def storeRarity(filename):
 
     try:
         url = 'https://api.opensea.io/api/v1/collection/{}'.format(slug)
+        print(url)
         header = { 
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36",
         }   
@@ -153,6 +155,7 @@ def storeRarity(filename):
     
     f = open("price/{}.txt".format(slug),"w")
     f.write(json.dumps(result))
+    f.close()
 
 if __name__ == '__main__':
     while True:
@@ -160,6 +163,8 @@ if __name__ == '__main__':
         if not filenames:
             print('no file go to sleep for a minute')
             time.sleep(60)
+            
+            continue
         
         threads = []
         for index,filename in enumerate(filenames):

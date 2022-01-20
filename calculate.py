@@ -2,7 +2,6 @@ import os.path
 import json
 from random import triangular
 import requests
-import numpy_indexed as npi
 from collections import Counter
 from itertools import groupby
 import unittest
@@ -10,6 +9,7 @@ import copy
 import pause
 import datetime
 import time
+import threading
 
 def getCollectionTotalCount(assets_response):
     return assets_response['assets'][0]['token_id']
@@ -46,7 +46,7 @@ def getAssetsRarityScore(traits,total,trait_object,trait_type_count):
     
     trait_len = len(traits)
     counts_of_this_trait = trait_type_count[trait_len]
-    value = 1 / round((counts_of_this_trait/int(total)),2)
+    value = 1 / (counts_of_this_trait/int(total))
 
     score += value
 
@@ -60,6 +60,8 @@ def getListenCollection():
         if os.path.exists(file_name):
             with open(file_name) as f:
                 data = f.read()
+            if not data:
+                continue
             data = json.loads(data)
             is_need_get_data = False
             
@@ -90,9 +92,15 @@ def getAssetsWithScore(collection_slug):
     is_get_data = True
     while is_get_data:
         data = getAssets(contract_address,len(assets))
-        if not data['assets']:
-            is_get_data = False
-        assets = assets + data['assets']
+        try:
+            tmp = data['assets']
+            assets = assets + data['assets']
+    
+            if not data['assets']:
+                is_get_data = False
+
+        except KeyError:
+            is_get_data = False        
 
     total = len(assets)
 
@@ -121,6 +129,7 @@ def getAssetsWithScore(collection_slug):
 def writeFile(file_path,content):
     f = open("{}.txt".format(file_path),"w")
     f.write(json.dumps(content))
+    f.close()
 
 def get_trait_count(input):
     traits_count  = {}
@@ -133,6 +142,21 @@ def get_trait_count(input):
     
     return traits_count
 
+def calculate(slug):
+    if os.path.exists('contract/{}.txt'.format(slug)):
+        print('{} exists'.format(slug))
+        
+        return 
+    else:
+        print('{} no exists'.format(slug))
+        
+    assets_score = getAssetsWithScore(slug)
+
+    if not assets_score:
+        return 
+    sortd = sorted(assets_score, key = lambda s: s['score'],reverse=True)
+    writeFile('contract/{}'.format(slug),sortd)
+    print('done writing')
 class TestStringMethods(unittest.TestCase):
     def test_get_trait_count(self):
         input  =  {
@@ -191,22 +215,15 @@ if __name__ == '__main__':
         if not listen_collections:
             time.sleep(120)
             continue
-    
-        for listen_collection in listen_collections:
-            if os.path.exists('contract/{}.txt'.format(listen_collection)):
-                print('{} exists'.format(listen_collection))
-                
-                continue
-            else:
-                print('{} no exists'.format(listen_collection))
-                
-            assets_score = getAssetsWithScore(listen_collection)
-            if not assets_score:
-                break
-            sortd = sorted(assets_score, key = lambda s: s['score'],reverse=True)
-            writeFile('contract/{}'.format(listen_collection),sortd)
-            print('done writing')
-    
+        
+        threads = []
+        for index,listen_collection in enumerate(listen_collections):
+            threads.append(threading.Thread(target = calculate,args = (listen_collection,)))
+            threads[index].start()
+            
+        for thread in threads:
+            thread.join()
+            
         print('end calculate')
 
         now = datetime.datetime.now()

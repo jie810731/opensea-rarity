@@ -21,6 +21,6 @@ services:
   checkbuyable:
     build:
       context: ./
-      dockerfile: ./dockerFile/checkBuyAbleDockerfile
+      dockerfile: ./dockerFile/CheckBuyAbleDockerfile
     volumes:
       - ./:/app
