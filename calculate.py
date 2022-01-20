@@ -7,6 +7,9 @@ from collections import Counter
 from itertools import groupby
 import unittest
 import copy
+import pause
+import datetime
+import time
 
 def getCollectionTotalCount(assets_response):
     return assets_response['assets'][0]['token_id']
@@ -183,12 +186,27 @@ class TestStringMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     # unittest.main()
-    listen_collections = getListenCollection()
-    print('list_collection_slug = :{}'.format(listen_collections))
-    for listen_collection in listen_collections:
-        assets_score = getAssetsWithScore(listen_collection)
-        sortd = sorted(assets_score, key = lambda s: s['score'],reverse=True)
-        writeFile('contract/{}'.format(listen_collection),sortd)
-        print('done writing')
+    while True:
+        listen_collections = getListenCollection()
+        if not listen_collections:
+            time.sleep(120)
+            continue
     
-    print('end calculate')
+        for listen_collection in listen_collections:
+            if os.path.exists('contract/{}.txt'.format(listen_collection)):
+                print('{} exists'.format(listen_collection))
+                
+                continue
+            else:
+                print('{} no exists'.format(listen_collection))
+                
+            assets_score = getAssetsWithScore(listen_collection)
+            sortd = sorted(assets_score, key = lambda s: s['score'],reverse=True)
+            writeFile('contract/{}'.format(listen_collection),sortd)
+            print('done writing')
+    
+        print('end calculate')
+
+        now = datetime.datetime.now()
+        until_time = now + datetime.timedelta(hours=1)
+        pause.until(until_time)

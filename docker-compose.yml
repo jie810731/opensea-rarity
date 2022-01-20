@@ -18,3 +18,9 @@ services:
       dockerfile: ./dockerFile/UpdatePriceDockerfile
     volumes:
       - ./:/app
+  checkbuyable:
+    build:
+      context: ./
+      dockerfile: ./dockerFile/checkBuyAbleDockerfile
+    volumes:
+      - ./:/app

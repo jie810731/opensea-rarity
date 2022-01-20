@@ -3,6 +3,10 @@ import glob
 import json
 import requests
 import math
+import time
+import pause
+import datetime
+import threading
 
 def getAssetItems(file_path):
     with open(file_path) as f:
@@ -151,8 +155,22 @@ def storeRarity(filename):
     f.write(json.dumps(result))
 
 if __name__ == '__main__':
-    filenames = glob.glob("contract/*.txt")
-    for filename in filenames:
-        storeRarity(filename)
-    
-    print('end updatePrice')
+    while True:
+        filenames = glob.glob("contract/*.txt")
+        if not filenames:
+            print('no file go to sleep for a minute')
+            time.sleep(60)
+        
+        threads = []
+        for index,filename in enumerate(filenames):
+            threads.append(threading.Thread(target = storeRarity,args = (filename,)))
+            threads[index].start()
+        
+        for thread in threads:
+            thread.join()
+
+        print('end updatePrice')
+
+        now = datetime.datetime.now()
+        until_time = now + datetime.timedelta(minutes=10)
+        pause.until(until_time)
