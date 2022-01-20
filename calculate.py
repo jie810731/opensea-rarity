@@ -115,7 +115,7 @@ def getAssetsWithScore(collection_slug):
         }
         
         result.append(formate)
-
+    print(result)
     return result
 
 def writeFile(file_path,content):
@@ -201,6 +201,8 @@ if __name__ == '__main__':
                 print('{} no exists'.format(listen_collection))
                 
             assets_score = getAssetsWithScore(listen_collection)
+            if not assets_score:
+                break
             sortd = sorted(assets_score, key = lambda s: s['score'],reverse=True)
             writeFile('contract/{}'.format(listen_collection),sortd)
             print('done writing')
