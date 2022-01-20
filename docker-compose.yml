@@ -12,3 +12,9 @@ services:
       dockerfile: ./dockerFile/CalculateDockerfile
     volumes:
       - ./:/app
+  updateprice:
+    build:
+      context: ./
+      dockerfile: ./dockerFile/UpdatePriceDockerfile
+    volumes:
+      - ./:/app

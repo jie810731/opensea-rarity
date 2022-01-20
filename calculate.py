@@ -31,13 +31,14 @@ def getAssetsRarityScore(traits,total,trait_object,trait_type_count):
     duplicate_trait_object = copy.deepcopy(trait_object)
     score = 0
     for trait in traits:
-        value = 1 / round((trait['trait_count']/int(total)),2)
+        duplicate_trait_object.pop(trait['trait_type'])
+        if trait['trait_count'] == 0 :
+            break
+        value = 1 / (trait['trait_count']/int(total))
         score += value
 
-        duplicate_trait_object.pop(trait['trait_type'])
-
     for key,count in duplicate_trait_object.items():
-        value = 1 / round(((total-count)/int(total)),2)
+        value = 1 / ((total-count)/int(total))
         score += value
     
     trait_len = len(traits)
@@ -103,7 +104,8 @@ def getAssetsWithScore(collection_slug):
         trait_type_count[key] = len(list(groups))
 
     for index,asset in enumerate(assets):
-        score = getAssetsRarityScore(traits,total,traits_count,trait_type_count)
+        score = getAssetsRarityScore(asset['traits'],total,traits_count,trait_type_count)
+
         formate = {
             'token_id': asset['token_id'],
             'score':score
@@ -187,3 +189,6 @@ if __name__ == '__main__':
         assets_score = getAssetsWithScore(listen_collection)
         sortd = sorted(assets_score, key = lambda s: s['score'],reverse=True)
         writeFile('contract/{}'.format(listen_collection),sortd)
+        print('done writing')
+    
+    print('end calculate')
