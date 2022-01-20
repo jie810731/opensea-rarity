@@ -6,3 +6,9 @@ services:
       dockerfile: ./dockerFile/GetListDockerfile
     volumes:
       - ./:/app
+  calculate:
+    build:
+      context: ./
+      dockerfile: ./dockerFile/CalculateDockerfile
+    volumes:
+      - ./:/app

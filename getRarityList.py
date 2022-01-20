@@ -30,20 +30,19 @@ def getListResponse():
 
 def getContractAddress(list_response):
     result = []
-    for object in list_response['data']['collections']:
-        result.append(object['collection']['slug'])
-    
+    for object_item in list_response['data']['collections']:
+        result.append(object_item['collection']['slug'])
+
     return result
 
 if __name__ == "__main__":
-    while True:
-        print('get rarity list start')
-        list_response = getListResponse()
-        contract_address = getContractAddress(list_response)
+    # while True:
+    #     print('get rarity list start')
+    list_response = getListResponse()
+    contract_address = getContractAddress(list_response)
+    f = open("{}.txt".format('listen/listen_collection'),"w")
+    f.write(json.dumps(contract_address))
 
-        f = open("{}.txt".format('listen/listen_collection'),"w")
-        f.write(json.dumps(contract_address))
-
-        now = datetime.datetime.now()
-        until_time = now + datetime.timedelta(hours=1)
-        pause.until(until_time)
+    #     now = datetime.datetime.now()
+    #     until_time = now + datetime.timedelta(hours=1)
+    #     pause.until(until_time)
